@@ -396,9 +396,7 @@ IndicesSet* GraphGetSetAdjacentsTo(const Graph* g, unsigned int v) {
   return adjacents_set;
 }
 
-//
-// TO BE COMPLETED
-//
+//TODO: idk if I should add the Is weighted/ is digraph check
 // ONLY FOR UNDIRECTED GRAPHS
 //
 // Returns an array of size g->indicesRange storing
@@ -420,7 +418,7 @@ double* GraphComputeVertexWeights(const Graph* g) {
   for (size_t i = 0; i < ListGetSize(vertices); i++)
   {
     struct _Vertex* vert = ListGetCurrentItem(vertices);
-    int total_weight = 0;
+    double total_weight = 0.0;
 
     List* edges = vert->edgesList;
     ListMoveToHead(edges);
