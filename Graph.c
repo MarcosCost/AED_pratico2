@@ -415,9 +415,27 @@ double* GraphComputeVertexWeights(const Graph* g) {
     weightsArray[v] = -1.0;
   }
 
-  //
-  // TO BE COMPLETED
-  //
+  List* vertices = g->verticesList;
+  ListMoveToHead(vertices);
+  for (size_t i = 0; i < ListGetSize(vertices); i++)
+  {
+    struct _Vertex* vert = ListGetCurrentItem(vertices);
+    int total_weight = 0;
+
+    List* edges = vert->edgesList;
+    ListMoveToHead(edges);
+    for (size_t j = 0; j < ListGetSize(edges); j++)
+    {
+      total_weight += ((struct _Edge*)ListGetCurrentItem(edges))->weight;
+      ListMoveToNext(edges);
+    }
+
+    //Set vertex weight
+    weightsArray[vert->id] = total_weight;
+
+    ListMoveToNext(vertices);
+  }
+  
 
   return weightsArray;
 }
