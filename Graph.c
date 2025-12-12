@@ -365,9 +365,7 @@ IndicesSet* GraphGetSetVertices(const Graph* g) {
   return set;
 }
 
-//
-// TO BE COMPLETED
-//
+
 // for a given vertice v
 // return the set of its adjacent vertices
 // as a set of vertex indices
@@ -377,9 +375,23 @@ IndicesSet* GraphGetSetAdjacentsTo(const Graph* g, unsigned int v) {
 
   IndicesSet* adjacents_set = IndicesSetCreateEmpty(g->indicesRange);
 
-  //
-  // TO BE COMPLETED
-  //
+  List* vertices = g->verticesList;
+
+  struct _Vertex search_param;
+  search_param.id = v;
+  //Procura um node com id v e fica nele
+  ListSearch(vertices, (void*)(&search_param));
+
+  struct _Vertex* vert = ListGetCurrentItem(g->verticesList);
+  List* edges = vert->edgesList;
+  ListMoveToHead(edges);
+  for (size_t i = 0; i < ListGetSize(edges); i++)
+  {
+    IndicesSetAdd(adjacents_set, ((struct _Edge*)ListGetCurrentItem(edges))->adjVertex);
+    ListMoveToNext(edges);
+  }
+  
+  
 
   return adjacents_set;
 }
