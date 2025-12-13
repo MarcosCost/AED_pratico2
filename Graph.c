@@ -261,10 +261,45 @@ Graph* GraphGetSubgraph(const Graph* g, IndicesSet* vertSet) {
 
   // The "empty" subgraph
   Graph* new = GraphCreateEmpty(g->indicesRange, g->isDigraph, g->isWeighted);
+  
+  List* vertices = g->verticesList;
+  ListMoveToHead(vertices);
 
-  //
-  // TO BE COMPLETED
-  //
+  // Add All vertices into the new graph
+  for(size_t i = 0; i < ListGetSize(vertices); i++) {
+
+    struct _Vertex* vert = ListGetCurrentItem(vertices);
+    if(IndicesSetContains(vertSet, vert->id)) {
+      GraphAddVertex(new, vert->id);
+    }
+
+    ListMoveToNext(vertices);
+  }
+
+  // Now go back and add all edges (Couldn't add before due GraphAddEdge requiring both graphs )
+  ListMoveToHead(vertices);
+  for(size_t i = 0; i < ListGetSize(vertices); i++) {
+    
+    struct _Vertex* vert = ListGetCurrentItem(vertices);
+    if(IndicesSetContains(vertSet, vert->id)) {
+      List* edges = vert->edgesList;
+      ListMoveToHead(edges);
+      for(size_t j = 0; j < ListGetSize(edges); j++) {
+        struct _Edge* edge = ListGetCurrentItem(edges);
+        if(IndicesSetContains(vertSet, edge->adjVertex)) {
+          
+          if(g->isWeighted){  // TODO: Consider changind this IF with _addEdge for efficiency
+            GraphAddWeightedEdge(new, vert->id, edge->adjVertex, edge->weight);
+          } else {
+            GraphAddEdge(new, vert->id, edge->adjVertex);
+          }
+
+        }
+        ListMoveToNext(edges);
+      }
+    }
+    ListMoveToNext(vertices);
+  }
 
   GraphCheckInvariants(new);
 
@@ -298,7 +333,65 @@ static unsigned int _GetMaxDegree(const Graph* g) {
   if (ListIsEmpty(vertices)) return 0;
 
   unsigned int maxDegree = 0;
+  ListMoveToHead(vertices);int GraphCheckInvariants(const Graph* g) {
+  assert(g != NULL);
+
+  assert(g->isComplete == 0 || g->isComplete == 1);
+  assert(g->isDigraph == 0 || g->isDigraph == 1);
+  assert(g->isWeighted == 0 || g->isWeighted == 1);
+
+  if (g->isComplete) {
+    assert(g->indicesRange == g->numVertices);
+    unsigned int n = g->numVertices;
+    if (g->isDigraph) {
+      assert(g->numEdges == n * (n - 1));
+    } else {
+      assert(g->numEdges == n * (n - 1) / 2);
+    }
+  }
+
+  assert((int)g->numVertices == ListGetSize(g->verticesList));
+  assert((int)g->numVertices == IndicesSetGetNumElems(g->verticesSet));
+
+  // Checking the vertices list
+  ListTestInvariants(g->verticesList);
+
+  // Checking the total number of edges
+  unsigned int out_degree_total = 0;
+  unsigned int in_degree_total = 0;
+
+  List* vertices = g->verticesList;
   ListMoveToHead(vertices);
+  unsigned int i = 0;
+  for (; i < g->numVertices; ListMoveToNext(vertices), i++) {
+    struct _Vertex* v = ListGetCurrentItem(vertices);
+    assert(IndicesSetContains(g->verticesSet, v->id));
+    out_degree_total += v->outDegree;
+    if (g->isDigraph) {
+      in_degree_total += v->inDegree;
+    }
+  }
+
+  if (g->isDigraph) {
+    assert(in_degree_total == out_degree_total);
+    assert(g->numEdges == out_degree_total);
+  } else {
+    // Unidrected graph
+    assert(g->numEdges == out_degree_total / 2);
+  }
+
+  // For each vertex, checking its adjacency list
+  ListMoveToHead(vertices);
+  i = 0;
+  for (; i < g->numVertices; ListMoveToNext(vertices), i++) {
+    struct _Vertex* v = ListGetCurrentItem(vertices);
+    List* edges = v->edgesList;
+    ListTestInvariants(edges);
+    assert((int)v->outDegree == ListGetSize(edges));
+  }
+
+  return 0;
+}
   unsigned int i = 0;
   for (; i < g->numVertices; ListMoveToNext(vertices), i++) {
     struct _Vertex* v = ListGetCurrentItem(vertices);
