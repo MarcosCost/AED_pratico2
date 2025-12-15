@@ -10,7 +10,7 @@
 // Student Name :   Marcos Costa
 // Student Number : 125882
 // Student Name :   Francisco Baptista
-// Student Number : TODO
+// Student Number : 124677
 
 /*** COMPLETE THE GraphGetSetAdjacentsTo FUNCTION */
 /*** COMPLETE THE GraphComputeVertexWeights FUNCTION ***/
@@ -489,7 +489,6 @@ IndicesSet* GraphGetSetAdjacentsTo(const Graph* g, unsigned int v) {
   return adjacents_set;
 }
 
-//TODO: idk if I should add the Is weighted/ is digraph check
 // ONLY FOR UNDIRECTED GRAPHS
 //
 // Returns an array of size g->indicesRange storing

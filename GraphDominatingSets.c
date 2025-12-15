@@ -6,10 +6,10 @@
 // GraphDominatingSets - Computing Vertex Dominating Sets for UNDIRECTED graphs
 //
 
-// Student Name :
-// Student Number :
-// Student Name :
-// Student Number :
+// Student Name :   Marcos Costa
+// Student Number : 125882
+// Student Name :   Francisco Baptista
+// Student Number : 124677
 
 /*** COMPLETE THE GraphIsDominatingSet FUNCTION ***/
 /*** COMPLETE THE GraphMinDominatingSet FUNCTION ***/
