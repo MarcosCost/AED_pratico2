@@ -39,11 +39,33 @@ int GraphIsDominatingSet(const Graph* g, IndicesSet* vertSet) {
   assert(GraphIsDigraph(g) == 0);
   assert(IndicesSetIsEmpty(vertSet) == 0);
 
-  //
-  // TO BE COMPLETED
-  //
+  // If the graph is empty, any non-empty set is a dominating set.
+  if (GraphGetNumVertices(g) == 0) {
+    return 1;
+  }
+  
+  IndicesSet* allVertices = GraphGetSetVertices(g);
 
-  return 0;
+  IndicesSet* coveredVertices = IndicesSetCreateCopy(vertSet);
+
+  int v = IndicesSetGetFirstElem(vertSet);
+  while (v != -1)
+  {
+    IndicesSet* adjacents = GraphGetSetAdjacentsTo(g, v);
+
+    IndicesSetUnion(coveredVertices, adjacents);
+
+    IndicesSetDestroy(&adjacents);
+    v = IndicesSetGetNextElem(vertSet);
+  }
+  
+
+  int isDominating = IndicesSetIsEqual(coveredVertices, allVertices);
+
+  IndicesSetDestroy(&allVertices);
+  IndicesSetDestroy(&coveredVertices);
+
+  return isDominating;
 }
 
 //
