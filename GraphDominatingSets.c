@@ -68,9 +68,6 @@ int GraphIsDominatingSet(const Graph* g, IndicesSet* vertSet) {
   return isDominating;
 }
 
-//
-// TO BE COMPLETED
-//
 // Compute a MIN VERTEX DOMINATING SET of the graph
 // using an EXHAUSTIVE SEARCH approach
 // Return the/a dominating set
@@ -79,12 +76,58 @@ IndicesSet* GraphComputeMinDominatingSet(const Graph* g) {
   assert(g != NULL);
   assert(GraphIsDigraph(g) == 0);
 
-  //
-  // TO BE COMPLETED
-  //
+  if (GraphGetNumVertices(g) == 0) {
+    return IndicesSetCreateEmpty(GraphGetVertexRange(g));
+  }
+
+  int vertex_range = GraphGetVertexRange(g);
 
   // Change this according to your algorithm
-  IndicesSet* result = IndicesSetCreateEmpty(GraphGetVertexRange(g));
+  IndicesSet* result = NULL;
+  IndicesSet* allVertices =  GraphGetSetVertices(g);
+  IndicesSet* iterator = IndicesSetCreateEmpty(vertex_range);
+  int minsize = GraphGetNumVertices(g) + 1;
+
+  do
+  {
+    IndicesSet* candidate = IndicesSetCreateCopy(iterator);
+    IndicesSetIntersection(candidate, allVertices);
+
+    if (IndicesSetIsEmpty(candidate))
+    {
+      IndicesSetDestroy(&candidate);
+      continue;
+    }
+    
+    
+
+    if (GraphIsDominatingSet(g, candidate))
+    {
+      int currentSize = IndicesSetGetNumElems(candidate);
+      if (currentSize < minsize)
+      {
+        minsize = currentSize;
+        if (result != NULL)
+        {
+          IndicesSetDestroy(&result);
+        }
+        result = IndicesSetCreateCopy(candidate);    
+        if (minsize == 1)
+        {
+          IndicesSetDestroy(&candidate);
+          break;
+        }
+        
+      }
+      
+    }
+    IndicesSetDestroy(&candidate);
+
+  } while (IndicesSetNextSubset(iterator));
+  
+
+  IndicesSetDestroy(&allVertices);
+  IndicesSetDestroy(&iterator);
 
   return result;
 }
@@ -100,12 +143,52 @@ IndicesSet* GraphComputeMinWeightDominatingSet(const Graph* g) {
   assert(g != NULL);
   assert(GraphIsDigraph(g) == 0);
 
-  //
-  // TO BE COMPLETED
-  //
+  int vertex_range = GraphGetVertexRange(g);
 
-  // Change this according to your algorithm
-  IndicesSet* result = IndicesSetCreateEmpty(GraphGetVertexRange(g));
+  // The minimum weight dominating set for an empty graph is the empty set.
+  if (GraphGetNumVertices(g) == 0) {
+    return IndicesSetCreateEmpty(vertex_range);
+  }
+
+  IndicesSet* result = NULL;
+  IndicesSet* allVertices = GraphGetSetVertices(g);
+  IndicesSet* iterator = IndicesSetCreateEmpty(vertex_range);
+
+  double* vertexWeights = GraphComputeVertexWeights(g);
+  double minWeight = -1.0; 
+
+  do {
+    IndicesSet* candidate = IndicesSetCreateCopy(iterator);
+    IndicesSetIntersection(candidate, allVertices);
+
+    if (IndicesSetIsEmpty(candidate)) {
+      IndicesSetDestroy(&candidate);
+      continue;
+    }
+
+    if (GraphIsDominatingSet(g, candidate)) {
+      double currentWeight = 0.0;
+      int v = IndicesSetGetFirstElem(candidate);
+      while (v != -1) {
+        currentWeight += vertexWeights[v];
+        v = IndicesSetGetNextElem(candidate);
+      }
+
+      if (minWeight < 0.0 || currentWeight < minWeight) {
+        minWeight = currentWeight;
+        if (result != NULL) {
+          IndicesSetDestroy(&result);
+        }
+        result = IndicesSetCreateCopy(candidate);
+      }
+    }
+    IndicesSetDestroy(&candidate);
+
+  } while (IndicesSetNextSubset(iterator));
+
+  free(vertexWeights);
+  IndicesSetDestroy(&allVertices);
+  IndicesSetDestroy(&iterator);
 
   return result;
 }
